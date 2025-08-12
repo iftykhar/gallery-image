@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 // This function fetches image data from a public API
 export async function fetchImages() {
-  const res = await fetch('https://jsonplaceholder.typicode.com/photos?_limit=10');
+  const res = await fetch('https://api.allorigins.win/get?url=https://random-d.uk/api/v2/random');
   if (!res.ok) {
     throw new Error('Failed to fetch');
   }
