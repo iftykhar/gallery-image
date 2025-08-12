@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ClientProvider from "./ClientProvider"; // We'll create this next
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,26 +20,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <header>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* Wrap children inside ClientProvider for React Query */}
+        <ClientProvider>{children}</ClientProvider>
 
-      </header>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-      <main>
-        {children}
-      </main>  
-
-      <footer className="text-center">
-        <p>© 2025 Gallery image</p>
-      </footer>
+        <footer className="text-center">
+          <p>© 2025 Gallery image</p>
+        </footer>
       </body>
-      
     </html>
   );
 }
