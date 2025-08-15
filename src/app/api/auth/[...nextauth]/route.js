@@ -10,28 +10,32 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // 1️⃣ Here you check your DB or API
-        const res = await fetch("https://your-backend.com/api/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: credentials?.email,
-            password: credentials?.password,
-          }),
-        });
+        const res = await fetch(
+          "https://mohab0104-backend-w28i.onrender.com/api/v1/auth/login",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: credentials?.email,
+              password: credentials?.password,
+            }),
+          }
+        );
 
-        const user = await res.json();
+        const resT = await res.json();
+        const userData = resT?.data;
 
-        // 2️⃣ If login fails
-        if (!res.ok || !user) {
-          return null; // null means login failed
+        if (!res.ok || !userData) {
+          return null;
         }
 
-        // 3️⃣ If login success — must return an object
         return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
+          id: userData.user._id,
+          email: userData.user.email,
+          name: `${userData.user.firstName} ${userData.user.lastName}`,
+          role: userData.user.role,
+          image: userData.user.imageLink,
+          token: userData.accessToken,
         };
       },
     }),
@@ -41,16 +45,32 @@ const handler = NextAuth({
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.user = user; // attach user info to token
+      // On first login
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.role = user.role;
+        token.image = user.image;
+        token.accessToken = user.token; // save backend token here
+      }
       return token;
     },
-async session({ session, token }) {
-  session.user = token.user; // attach user info to session
-  return session;
-}
-
+    async session({ session, token }) {
+      // Expose token data in session
+      session.user = {
+        id: token.id,
+        email: token.email,
+        name: token.name,
+        role: token.role,
+        image: token.image,
+      };
+      session.accessToken = token.accessToken;
+      return session;
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
+
 });
 
 export { handler as GET, handler as POST };
