@@ -13,9 +13,13 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function AuthPage() {
-  const { data: session } = useSession();
+  const {data: session} = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  console.log(session.accessToken, "session access token");
+
+
 
   const containerStyles =
     "flex h-screen items-center justify-center bg-gray-100 dark:bg-gray-900";
